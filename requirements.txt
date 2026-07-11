@@ -3,3 +3,9 @@ uvicorn[standard]
 pydantic
 python-dotenv
 openai
+
+chromadb
+sentence-transformers
+torch
+
+rank-bm25
