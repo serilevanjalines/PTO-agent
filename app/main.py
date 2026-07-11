@@ -19,11 +19,18 @@ from pydantic import BaseModel
 from . import config
 
 app = FastAPI(title="TimeOffBot")
+#Creates the web server
 
-_EMPLOYEES = {
-    e["id"]: e for e in json.loads((config.DATA_DIR / "employees.json").read_text())
-}
+employees = json.loads(
+    (config.DATA_DIR / "employees.json").read_text()
+)
 
+_EMPLOYEES = {}
+
+for e in employees:
+    key = e["id"]
+    value = e
+    _EMPLOYEES[key] = value
 
 class ChatRequest(BaseModel):
     message: str
