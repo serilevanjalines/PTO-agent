@@ -103,3 +103,30 @@ def index_documents():
     )
 
     return chunks
+
+
+def semantic_search(query: str, n_results: int = 3) -> list[dict]:
+
+    results = collection.query(
+        query_texts=[query],
+        n_results=n_results,
+    )
+
+    retrieved_chunks = []
+
+    documents = results["documents"][0]
+    metadatas = results["metadatas"][0]
+    distances = results["distances"][0]
+
+    for document, metadata, distance in zip(documents, metadatas, distances):
+
+        retrieved_chunks.append(
+            {
+                "policy": metadata["policy"],
+                "country": metadata["country"],
+                "text": document,
+                "distance": distance,
+            }
+        )
+
+    return retrieved_chunks
