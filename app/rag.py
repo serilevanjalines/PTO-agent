@@ -227,3 +227,21 @@ def reciprocal_rank_fusion(semantic_results, bm25_results, top_k=3):
         retrieved_chunks.append(chunk_lookup[chunk_id])
 
     return retrieved_chunks
+
+
+def hybrid_search(query: str,top_k: int = 3) -> list[dict]:
+    """
+    Retrieve the most relevant policy chunks using
+    Hybrid Search (Semantic + BM25 + RRF).
+    """
+    semantic_results = semantic_search(query=query, n_results=top_k)
+
+    bm25_results = bm25_search(query=query, top_k=top_k)
+
+    retrieved_chunks = reciprocal_rank_fusion(
+        semantic_results=semantic_results,
+        bm25_results=bm25_results,
+        top_k=top_k,
+    )
+
+    return retrieved_chunks
