@@ -1,6 +1,7 @@
 import json
 
 from . import config
+from .rag import hybrid_search
 
 _REQUESTS = json.loads(
     (config.DATA_DIR / "requests.json").read_text()
@@ -67,3 +68,25 @@ def check_balance(employee_id: str,leave_type: str|None=None) -> list[dict]:
         filtered_balances.append(balance)
 
     return filtered_balances
+
+
+def search_policy(query: str, top_k: int = 3,):
+    """
+    Search company leave policies using Hybrid RAG.
+    """
+    retrieved_chunks = hybrid_search(
+    query=query,
+    top_k=top_k,
+    )
+
+    contexts = []
+
+    for chunk in retrieved_chunks:
+        contexts.append(
+        f"""Policy: {chunk["policy"]}
+        Country: {chunk["country"]}
+
+        {chunk["text"]}"""
+        )
+
+    return "\n\n----------------------\n\n".join(contexts)
