@@ -51,6 +51,8 @@ def chunk_documents() -> list[dict]:
     documents = load_documents()
     chunks = []
 
+    chunk_id = 0
+
     for document in documents:
 
         policy = document["policy"]
@@ -62,13 +64,16 @@ def chunk_documents() -> list[dict]:
             country, text = section.split("\n", maxsplit=1)
             chunks.append(
                 {
+                    "id":f"chunk-{chunk_id}",
                     "policy": policy,
                     "country": country.strip(),
                     "text": text.strip(),
                 }
             )
+            chunk_id += 1
 
     return chunks
+
 
 
 
@@ -118,11 +123,13 @@ def semantic_search(query: str, n_results: int = 3) -> list[dict]:
     documents = results["documents"][0]
     metadatas = results["metadatas"][0]
     distances = results["distances"][0]
+    chunk_ids = results["ids"][0]
 
-    for document, metadata, distance in zip(documents, metadatas, distances):
+    for chunk_id , document, metadata, distance in zip(chunk_ids,documents, metadatas, distances):
 
         retrieved_chunks.append(
-            {
+            {   
+                "id": chunk_id,
                 "policy": metadata["policy"],
                 "country": metadata["country"],
                 "text": document,
@@ -178,3 +185,45 @@ def bm25_search(query: str, top_k: int = 3):
         top_chunks.append(chunk)
 
     return top_chunks
+
+
+def reciprocal_rank_fusion(semantic_results, bm25_results, top_k=3):
+    """
+    combine the results from semantic search and BM25 using Reciprocal Rank Fusion (RRF).
+    """
+
+    fusion_scores = {}
+
+    for rank, chunk in enumerate(semantic_results, start=1):
+
+        chunk_id = chunk["id"]
+
+        if chunk_id not in fusion_scores:
+            fusion_scores[chunk_id] = 0
+
+        fusion_scores[chunk_id] += 1 / (60 + rank)
+
+    for rank, chunk in enumerate(bm25_results, start=1):
+
+        chunk_id = chunk["id"]
+
+        if chunk_id not in fusion_scores:
+            fusion_scores[chunk_id] = 0
+
+        fusion_scores[chunk_id] += 1 / (60 + rank)
+
+    sorted_chunks = sorted(fusion_scores.items(),key=lambda item: item[1],reverse=True)
+
+    all_chunks = chunk_documents()
+
+    chunk_lookup = {}
+
+    for chunk in all_chunks:
+        chunk_lookup[chunk["id"]] = chunk
+
+    retrieved_chunks = []
+
+    for chunk_id, score in sorted_chunks[:top_k]:
+        retrieved_chunks.append(chunk_lookup[chunk_id])
+
+    return retrieved_chunks
