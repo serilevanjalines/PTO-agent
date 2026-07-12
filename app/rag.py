@@ -1,5 +1,6 @@
 import chromadb
 from chromadb.utils import embedding_functions
+from rank_bm25 import BM25Okapi
 
 from pathlib import Path
 
@@ -130,3 +131,50 @@ def semantic_search(query: str, n_results: int = 3) -> list[dict]:
         )
 
     return retrieved_chunks
+
+
+
+def build_bm25_index():
+    chunks = chunk_documents()
+
+    tokenized_corpus = []
+
+    for chunk in chunks:
+        tokens = chunk["text"].lower().split()
+        tokenized_corpus.append(tokens)
+
+    bm25 = BM25Okapi(tokenized_corpus)
+
+    return bm25, chunks
+
+
+
+def bm25_search(query: str, top_k: int = 3):
+    """
+    Search policy chunks using BM25 keyword search.
+    """
+
+    bm25, chunks = build_bm25_index()
+
+    query_tokens = query.lower().split()
+
+    scores = bm25.get_scores(query_tokens)
+
+    scored_chunks = []
+
+    for index, score in enumerate(scores):
+        scored_chunks.append((index, score))
+
+    scored_chunks.sort(
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    top_chunks = []
+
+    for chunk_index, score in scored_chunks[:top_k]:
+        chunk = chunks[chunk_index].copy()
+        chunk["score"] = score
+        top_chunks.append(chunk)
+
+    return top_chunks
