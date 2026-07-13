@@ -77,6 +77,19 @@ def chunk_documents() -> list[dict]:
 
 
 
+def filter_chunks(chunks: list[dict], country: str) -> list[dict]:
+    """
+    Filter policy chunks by country.
+    """
+    filtered_chunks = []
+
+    for chunk in chunks:
+        if chunk["country"].lower() == country.lower() or chunk["country"].lower() == "global":
+            filtered_chunks.append(chunk)
+
+    return filtered_chunks
+
+
 def index_documents():
     """
     Convert policy chunks into embeddings
@@ -111,11 +124,14 @@ def index_documents():
     return chunks
 
 
-def semantic_search(query: str, n_results: int = 3) -> list[dict]:
+def semantic_search(query: str,country:str, n_results: int = 3) -> list[dict]:
 
     results = collection.query(
         query_texts=[query],
         n_results=n_results,
+        where={
+         "country": country
+        }
     )
 
     retrieved_chunks = []
@@ -141,8 +157,9 @@ def semantic_search(query: str, n_results: int = 3) -> list[dict]:
 
 
 
-def build_bm25_index():
+def build_bm25_index(country:str):
     chunks = chunk_documents()
+    chunks = filter_chunks(chunks, country)
 
     tokenized_corpus = []
 
@@ -156,12 +173,12 @@ def build_bm25_index():
 
 
 
-def bm25_search(query: str, top_k: int = 3):
+def bm25_search(query: str, country : str, top_k: int = 3):
     """
     Search policy chunks using BM25 keyword search.
     """
 
-    bm25, chunks = build_bm25_index()
+    bm25, chunks = build_bm25_index(country)
 
     query_tokens = query.lower().split()
 
@@ -229,14 +246,14 @@ def reciprocal_rank_fusion(semantic_results, bm25_results, top_k=3):
     return retrieved_chunks
 
 
-def hybrid_search(query: str,top_k: int = 3) -> list[dict]:
+def hybrid_search(query: str,country:str,top_k: int = 3) -> list[dict]:
     """
     Retrieve the most relevant policy chunks using
     Hybrid Search (Semantic + BM25 + RRF).
     """
-    semantic_results = semantic_search(query=query, n_results=top_k)
+    semantic_results = semantic_search(query=query, country=country, n_results=top_k)
 
-    bm25_results = bm25_search(query=query, top_k=top_k)
+    bm25_results = bm25_search(query=query, country=country, top_k=top_k)
 
     retrieved_chunks = reciprocal_rank_fusion(
         semantic_results=semantic_results,

@@ -8,11 +8,18 @@ It cannot yet answer policy questions, check leave balances, or submit
 time-off requests. Building those capabilities is the lab — see coursework.md.
 """
 
+from ast import arguments
+from email.mime import message
 import json
 from pathlib import Path
+from unittest import result
+
+from .tool_schema import TOOLS
+from .tools import (search_policy,check_balance,list_leave_requests)
 
 from fastapi import FastAPI, Header
 from fastapi.responses import FileResponse
+
 from openai import AzureOpenAI
 from pydantic import BaseModel
 
@@ -58,18 +65,21 @@ def users():
 @app.post("/api/chat")
 def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id")):
     """Plain conversation with the LLM — no policy, balance, or request logic yet."""
+
     emp = _EMPLOYEES.get(x_user_id)
+
     who = (
-        f"You are talking to {emp['full_name']}, based in {emp['country']}."
+        f"You are talking to {emp['full_name']} , based in {emp['country']}."
         if emp
         else "You are talking to an Acme Corp employee."
     )
+
     system = (
         "You are TimeOffBot, a friendly assistant for Acme Corp employees. "
         + who
-        + " Right now you can only make small talk. You cannot look up leave "
-        "policies, check balances, or submit time-off requests yet. If the user "
-        "asks for any of those, say plainly that you can't do that yet."
+        + " You can answer leave policy questions, check leave balances, "
+      "and list employee leave requests using the available tools."
+
     )
     resp = _client().chat.completions.create(
         model=config.AZURE_CHAT_DEPLOYMENT,
@@ -78,8 +88,60 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
             {"role": "system", "content": system},
             {"role": "user", "content": req.message},
         ],
+        tools=TOOLS
     )
-    return {"reply": resp.choices[0].message.content}
+    
+    message = resp.choices[0].message
+
+    tool_map = {
+    "search_policy": search_policy,
+    "check_balance": check_balance,
+    "list_leave_requests": list_leave_requests,
+    }
+
+    if message.tool_calls:
+
+        for tool_call in message.tool_calls:
+
+            function_name = tool_call.function.name
+            tool = tool_map[function_name]
+
+            arguments = json.loads(tool_call.function.arguments)
+
+            if function_name != "search_policy":
+                arguments["employee_id"] = x_user_id
+    
+            print("Calling:", function_name)
+
+            result = tool(**arguments)
+
+            
+            messages = [
+                 {"role": "system", "content": system},
+                 {"role": "user", "content": req.message},
+                 message,
+            ]
+
+            messages.append(
+            {
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": json.dumps(result),
+            }
+            )
+
+            final_response = _client().chat.completions.create(
+                    model=config.AZURE_CHAT_DEPLOYMENT,
+                    temperature=0.5,
+                    messages=messages,
+            )
+
+            return {
+                    "reply": final_response.choices[0].message.content
+            }
+
+    else:
+        return {"reply": message.content}
 
 
 @app.get("/")
