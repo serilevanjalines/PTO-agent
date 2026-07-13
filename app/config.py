@@ -9,6 +9,7 @@ load_dotenv()
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
+POLICY_DIR = ROOT / "samples" / "policies"
 
 AZURE_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
 AZURE_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")

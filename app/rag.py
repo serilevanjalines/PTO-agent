@@ -6,8 +6,6 @@ from pathlib import Path
 
 from . import config
 
-POLICY_DIR = Path("samples") / "policies"
-
 ef = embedding_functions.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2"
 )
@@ -29,7 +27,7 @@ def load_documents() -> list[dict]:
     
     documents = []
 
-    for file in POLICY_DIR.glob("*.md"):
+    for file in config.POLICY_DIR.glob("*.md"):
         policy_name = file.stem
         content = file.read_text()
         documents.append(
@@ -67,7 +65,11 @@ def chunk_documents() -> list[dict]:
                     "id":f"chunk-{chunk_id}",
                     "policy": policy,
                     "country": country.strip(),
-                    "text": text.strip(),
+                    "text": (
+                        f"Policy: {policy}\n"
+                        f"Country: {country.strip()}\n\n"
+                        f"{text.strip()}"
+                    )
                 }
             )
             chunk_id += 1
@@ -136,6 +138,7 @@ def semantic_search(query: str,country:str, n_results: int = 3) -> list[dict]:
             ]
         }
     )
+    
 
     retrieved_chunks = []
 
@@ -255,8 +258,9 @@ def hybrid_search(query: str,country:str,top_k: int = 3) -> list[dict]:
     Hybrid Search (Semantic + BM25 + RRF).
     """
     semantic_results = semantic_search(query=query, country=country, n_results=top_k)
-
+    
     bm25_results = bm25_search(query=query, country=country, top_k=top_k)
+    
 
     retrieved_chunks = reciprocal_rank_fusion(
         semantic_results=semantic_results,
