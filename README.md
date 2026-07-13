@@ -1,6 +1,6 @@
-# 🕒 TimeOffBot
+#  PaidTimeOff Agent
 
-An AI-powered Time-Off Management Assistant built with FastAPI, Azure OpenAI, and Hybrid Retrieval.
+An AI-powered Time-Off Management Agent built with FastAPI, Azure OpenAI, and Hybrid Retrieval.
 
 The assistant helps employees answer leave policy questions, check leave balances, and view leave requests using Retrieval-Augmented Generation (RAG) and OpenAI Tool Calling.
 
@@ -8,20 +8,20 @@ The assistant helps employees answer leave policy questions, check leave balance
 
 ## Features
 
-### 📖 Leave Policy Assistant
+###   Leave Policy Assistant
 - Answers company leave policy questions using Hybrid RAG
 - Country-aware policy retrieval
 - Supports Annual Leave, Sick Leave and Parental Leave policies
 
-### 📅 Leave Balance
+###  Leave Balance
 - Retrieves employee leave balances
 - Automatically identifies the authenticated employee
 
-### 📋 Leave Requests
+###  Leave Requests
 - Lists previous leave requests
 - Filters results based on the authenticated employee
 
-### 🚧 Planned
+###  Planned
 - Leave request submission
 - Multi-tool reasoning
 - Conversation memory
@@ -132,15 +132,18 @@ This improves retrieval robustness by returning documents that are consistently 
 
 # Current Status
 
-- ✅ Tool Calling
-- ✅ Hybrid RAG
-- ✅ Country-aware Retrieval
-- ✅ ChromaDB
-- ✅ BM25
-- ✅ Reciprocal Rank Fusion
-- ✅ Leave Balance
-- ✅ Leave Requests
-- 🚧 Leave Submission
-- 🚧 LangGraph
-- 🚧 Conversation Memory
-- 🚧 Multi-tool Reasoning
+-  Tool Calling
+-  Hybrid RAG
+-  Country-aware Retrieval
+-  ChromaDB
+-  BM25
+-  Reciprocal Rank Fusion
+-  Leave Balance
+-  Leave Requests
+
+ # Pending :
+
+-  Leave Submission
+-  LangGraph
+-  Conversation Memory
+-  Multi-tool Reasoning
