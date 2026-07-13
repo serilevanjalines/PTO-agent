@@ -130,7 +130,10 @@ def semantic_search(query: str,country:str, n_results: int = 3) -> list[dict]:
         query_texts=[query],
         n_results=n_results,
         where={
-         "country": country
+        "$or": [
+                {"country": country},
+                {"country": "Global"}
+            ]
         }
     )
 

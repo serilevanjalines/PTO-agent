@@ -24,20 +24,10 @@ from openai import AzureOpenAI
 from pydantic import BaseModel
 
 from . import config
+from .data_store import _EMPLOYEES
 
 app = FastAPI(title="TimeOffBot")
 #Creates the web server
-
-employees = json.loads(
-    (config.DATA_DIR / "employees.json").read_text()
-)
-
-_EMPLOYEES = {}
-
-for e in employees:
-    key = e["id"]
-    value = e
-    _EMPLOYEES[key] = value
 
 class ChatRequest(BaseModel):
     message: str
@@ -75,12 +65,14 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
     )
 
     system = (
-        "You are TimeOffBot, a friendly assistant for Acme Corp employees. "
-        + who
-        + " You can answer leave policy questions, check leave balances, "
-      "and list employee leave requests using the available tools."
-
-    )
+    "You are TimeOffBot, a friendly assistant for Acme Corp employees. "
+    + who +
+    " You can answer leave policy questions, check leave balances, "
+    "and list employee leave requests using the available tools. "
+    "Always answer using the authenticated employee's information. "
+    "When answering policy questions, use the policy applicable to the employee's country. "
+    "If the user asks about another country's policy, explain that your answers are based on their employment country unless they explicitly ask for a comparison."
+)
     resp = _client().chat.completions.create(
         model=config.AZURE_CHAT_DEPLOYMENT,
         temperature=0.5,
@@ -108,8 +100,7 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
 
             arguments = json.loads(tool_call.function.arguments)
 
-            if function_name != "search_policy":
-                arguments["employee_id"] = x_user_id
+            arguments["employee_id"] = x_user_id
     
             print("Calling:", function_name)
 

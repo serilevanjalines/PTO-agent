@@ -1,5 +1,5 @@
 import json
-
+from .data_store import _EMPLOYEES
 from . import config
 from .rag import hybrid_search
 
@@ -70,12 +70,17 @@ def check_balance(employee_id: str,leave_type: str|None=None) -> list[dict]:
     return filtered_balances
 
 
-def search_policy(query: str, top_k: int = 3,):
+def search_policy(query: str, employee_id:str, top_k: int = 3,):
     """
     Search company leave policies using Hybrid RAG.
     """
+
+    employee = _EMPLOYEES[employee_id]
+    country = employee["country"]
+    
     retrieved_chunks = hybrid_search(
     query=query,
+    country=country,
     top_k=top_k,
     )
 
