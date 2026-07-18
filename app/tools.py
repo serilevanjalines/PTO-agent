@@ -1,37 +1,8 @@
 import json
-from .data_store import _EMPLOYEES
+from .data_store import _EMPLOYEES , _REQUESTS_BY_EMPLOYEE ,_BALANCES_BY_EMPLOYEE
 from . import config
 from .rag import hybrid_search
-
-_REQUESTS = json.loads(
-    (config.DATA_DIR / "requests.json").read_text()
-)
-
-__BALANCES = json.loads(
-    (config.DATA_DIR / "balances.json").read_text()
-)
-
-_REQUESTS_BY_EMPLOYEE = {}
-
-_BALANCES_BY_EMPLOYEE = {}
-
-for request in _REQUESTS:
-    employee_id = request["employee_id"]
-
-    if employee_id not in _REQUESTS_BY_EMPLOYEE:
-        _REQUESTS_BY_EMPLOYEE[employee_id] = []
-
-    _REQUESTS_BY_EMPLOYEE[employee_id].append(request)
-
-
-
-for balance in __BALANCES:
-    employee_id = balance["employee_id"]
-    
-    if employee_id not in _BALANCES_BY_EMPLOYEE:
-        _BALANCES_BY_EMPLOYEE[employee_id] = []
-
-    _BALANCES_BY_EMPLOYEE[employee_id].append(balance)
+from .leave_service import submit_leave_request as submit_leave
 
 
 def list_leave_requests(employee_id: str,status: str | None = None,leave_type: str | None = None,) -> list[dict]:
@@ -95,3 +66,19 @@ def search_policy(query: str, employee_id:str, top_k: int = 3,):
         )
 
     return "\n\n----------------------\n\n".join(contexts)
+
+
+
+def submit_leave_request(
+    employee_id: str,
+    leave_type: str,
+    start_date: str,
+    end_date: str,
+    reason: str,
+):
+    """
+    Submit a leave request.
+    """
+
+    return submit_leave(employee_id , leave_type , start_date , end_date , reason)
+    

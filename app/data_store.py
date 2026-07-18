@@ -48,3 +48,19 @@ for balance in __BALANCES:
         _BALANCES_BY_EMPLOYEE[employee_id] = []
 
     _BALANCES_BY_EMPLOYEE[employee_id].append(balance)
+
+
+
+
+def save_requests():
+    """
+    Persist all leave requests to requests.json.
+    """
+
+    (config.DATA_DIR / "requests.json").write_text(
+        json.dumps(
+            _REQUESTS,
+            indent=2
+        )
+    )
+    

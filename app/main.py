@@ -15,7 +15,7 @@ from pathlib import Path
 from unittest import result
 
 from .tool_schema import TOOLS
-from .tools import (search_policy,check_balance,list_leave_requests)
+from .tools import (search_policy,check_balance,list_leave_requests,submit_leave_request)
 
 from fastapi import FastAPI, Header
 from fastapi.responses import FileResponse
@@ -73,6 +73,7 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
     "When answering policy questions, use the policy applicable to the employee's country. "
     "If the user asks about another country's policy, explain that your answers are based on their employment country unless they explicitly ask for a comparison."
 )
+    
     resp = _client().chat.completions.create(
         model=config.AZURE_CHAT_DEPLOYMENT,
         temperature=0.5,
@@ -89,6 +90,7 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
     "search_policy": search_policy,
     "check_balance": check_balance,
     "list_leave_requests": list_leave_requests,
+    "submit_leave_request": submit_leave_request
     }
 
     if message.tool_calls:
@@ -104,7 +106,13 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
     
             print("Calling:", function_name)
 
-            result = tool(**arguments)
+            try:
+                result = tool(**arguments)
+
+            except ValueError as e:
+                result = {
+                    "error": str(e)
+                }
 
             
             messages = [
