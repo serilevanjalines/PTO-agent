@@ -114,6 +114,11 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
                     "error": str(e)
                 }
 
+            except Exception as e:
+                # Unexpected bug
+                print(f"Unexpected error in {function_name}: {e}")
+                raise
+
             
             messages = [
                  {"role": "system", "content": system},
