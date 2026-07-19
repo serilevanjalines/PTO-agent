@@ -52,58 +52,91 @@ def users():
     return list(_EMPLOYEES.values())
 
 
+
+
 @app.post("/api/chat")
-def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id")):
-    """Plain conversation with the LLM — no policy, balance, or request logic yet."""
+def chat(
+    req: ChatRequest,
+    x_user_id: str = Header(default="", alias="X-User-Id")
+):
+    """Conversation with the LLM using a multi-tool agent loop."""
 
     emp = _EMPLOYEES.get(x_user_id)
 
     who = (
-        f"You are talking to {emp['full_name']} , based in {emp['country']}."
+        f"You are talking to {emp['full_name']} "
+        f"whose id is {emp['id']}, based in {emp['country']}."
         if emp
         else "You are talking to an Acme Corp employee."
     )
 
     system = (
-    "You are TimeOffBot, a friendly assistant for Acme Corp employees. "
-    + who +
-    " You can answer leave policy questions, check leave balances, "
-    "and list employee leave requests using the available tools. "
-    "Always answer using the authenticated employee's information. "
-    "When answering policy questions, use the policy applicable to the employee's country. "
-    "If the user asks about another country's policy, explain that your answers are based on their employment country unless they explicitly ask for a comparison."
-)
-    
-    resp = _client().chat.completions.create(
-        model=config.AZURE_CHAT_DEPLOYMENT,
-        temperature=0.5,
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": req.message},
-        ],
-        tools=TOOLS
+        "You are TimeOffBot, a friendly assistant for Acme Corp employees. "
+        + who +
+        " You can answer leave policy questions, check leave balances, "
+        "and list employee leave requests using the available tools. "
+        "Always answer using the authenticated employee's information. "
+        "When answering policy questions, use the policy applicable to the employee's country. "
+        "If the user asks about another country's policy, explain that your answers are "
+        "based on their employment country unless they explicitly ask for a comparison."
     )
-    
-    message = resp.choices[0].message
 
     tool_map = {
-    "search_policy": search_policy,
-    "check_balance": check_balance,
-    "list_leave_requests": list_leave_requests,
-    "submit_leave_request": submit_leave_request
+        "search_policy": search_policy,
+        "check_balance": check_balance,
+        "list_leave_requests": list_leave_requests,
+        "submit_leave_request": submit_leave_request,
     }
 
-    if message.tool_calls:
+    # Start the conversation
+    messages = [
+        {
+            "role": "system",
+            "content": system,
+        },
+        {
+            "role": "user",
+            "content": req.message,
+        },
+    ]
 
+    # Multi-tool agent loop
+    while True:
+
+        # Ask the LLM what to do next
+        resp = _client().chat.completions.create(
+            model=config.AZURE_CHAT_DEPLOYMENT,
+            temperature=0.5,
+            messages=messages,
+            tools=TOOLS,
+        )
+
+        message = resp.choices[0].message
+
+        # If the LLM does not want to call a tool,
+        # it has produced the final answer.
+        if not message.tool_calls:
+            return {
+                "reply": message.content
+            }
+
+        # Save the assistant's tool-call message
+        messages.append(message)
+
+        # Execute ALL tools requested by the LLM
         for tool_call in message.tool_calls:
 
             function_name = tool_call.function.name
             tool = tool_map[function_name]
 
-            arguments = json.loads(tool_call.function.arguments)
+            arguments = json.loads(
+                tool_call.function.arguments
+            )
 
+            # Never trust employee_id provided by the LLM.
+            # Always use the authenticated employee ID.
             arguments["employee_id"] = x_user_id
-    
+
             print("Calling:", function_name)
 
             try:
@@ -114,33 +147,18 @@ def chat(req: ChatRequest, x_user_id: str = Header(default="", alias="X-User-Id"
                     "error": str(e)
                 }
 
-            
-            messages = [
-                 {"role": "system", "content": system},
-                 {"role": "user", "content": req.message},
-                 message,
-            ]
+            except Exception as e:
+                raise
 
+            # Add the result of this specific tool call
+            # back into the conversation.
             messages.append(
-            {
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": json.dumps(result),
-            }
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": json.dumps(result),
+                }
             )
-
-            final_response = _client().chat.completions.create(
-                    model=config.AZURE_CHAT_DEPLOYMENT,
-                    temperature=0.5,
-                    messages=messages,
-            )
-
-            return {
-                    "reply": final_response.choices[0].message.content
-            }
-
-    else:
-        return {"reply": message.content}
 
 
 @app.get("/")

@@ -56,12 +56,12 @@ def validate_dates(start_date: str, end_date: str):
 
     if start < today:
         raise ValueError(
-            f"Start date {start_date} cannot be in the past."
+            f"But today's date is {today} , Start date {start_date} cannot be in the past."
         )
 
     if start > end:
         raise ValueError(
-            "Start date cannot be after end date."
+            f"BUt today's date is {today} Start date cannot be after end date."
         )
 
     return True
