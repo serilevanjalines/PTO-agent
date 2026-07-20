@@ -15,6 +15,7 @@ from langchain_core.messages import (
     HumanMessage,
     AIMessage,
     ToolMessage,
+    SystemMessage,
 )
 
 from langgraph.graph import (
@@ -25,15 +26,14 @@ from langgraph.graph import (
 )
 
 
-# ============================================================
-# 1. GRAPH STATE
-# ============================================================
-
 class State(MessagesState):
     employee_id: str
 
 
-# Create the graph builder
+# ============================================================
+# 1. CREATE GRAPH BUILDER
+# ============================================================
+
 builder = StateGraph(State)
 
 
@@ -48,36 +48,30 @@ def agent_node(state: State):
 
     print("Agent running for:", employee_id)
 
-    # --------------------------------------------------------
-    # System prompt
-    # --------------------------------------------------------
-
-    system_message = {
-        "role": "system",
-        "content": (
-            "You are TimeOffBot, a friendly assistant for Acme Corp employees. "
-            f"The authenticated employee ID is {employee_id}. "
-            "Always use this authenticated employee ID when calling tools. "
-            "Never ask the user to provide their employee ID."
-        ),
-    }
-
-    # --------------------------------------------------------
-    # Convert LangGraph messages
-    # into Azure OpenAI message format
-    # --------------------------------------------------------
-
-    openai_messages = [
-        system_message
-    ]
+    # Convert LangGraph/LangChain messages
+    # into the dictionary format expected by Azure OpenAI.
+    openai_messages = []
 
     for message in messages:
 
         # ----------------------------------------------------
-        # HumanMessage
+        # System message
         # ----------------------------------------------------
 
-        if isinstance(message, HumanMessage):
+        if isinstance(message, SystemMessage):
+
+            openai_messages.append(
+                {
+                    "role": "system",
+                    "content": message.content,
+                }
+            )
+
+        # ----------------------------------------------------
+        # Human message
+        # ----------------------------------------------------
+
+        elif isinstance(message, HumanMessage):
 
             openai_messages.append(
                 {
@@ -87,7 +81,7 @@ def agent_node(state: State):
             )
 
         # ----------------------------------------------------
-        # AIMessage
+        # AI message
         # ----------------------------------------------------
 
         elif isinstance(message, AIMessage):
@@ -97,7 +91,7 @@ def agent_node(state: State):
                 "content": message.content or "",
             }
 
-            # AIMessage may contain tool calls
+            # AIMessage may contain tool calls.
             if message.tool_calls:
 
                 assistant_message["tool_calls"] = [
@@ -119,7 +113,7 @@ def agent_node(state: State):
             )
 
         # ----------------------------------------------------
-        # ToolMessage
+        # Tool message
         # ----------------------------------------------------
 
         elif isinstance(message, ToolMessage):
@@ -132,9 +126,9 @@ def agent_node(state: State):
                 }
             )
 
-    # --------------------------------------------------------
-    # Call Azure OpenAI
-    # --------------------------------------------------------
+    # ========================================================
+    # CALL AZURE OPENAI
+    # ========================================================
 
     response = _client().chat.completions.create(
         model=config.AZURE_CHAT_DEPLOYMENT,
@@ -145,9 +139,9 @@ def agent_node(state: State):
 
     message = response.choices[0].message
 
-    # --------------------------------------------------------
-    # Convert Azure response into LangGraph AIMessage
-    # --------------------------------------------------------
+    # ========================================================
+    # CONVERT AZURE RESPONSE INTO LANGGRAPH AIMessage
+    # ========================================================
 
     tool_calls = []
 
@@ -185,18 +179,15 @@ def should_continue(state: State):
 
     last_message = state["messages"][-1]
 
-    # The last message should be an AIMessage here.
-    # Only AIMessage can contain tool calls.
-
+    # Only an AIMessage can request tools.
     if isinstance(last_message, AIMessage):
 
         if last_message.tool_calls:
 
             return "tools"
 
-    # No tool call means the LLM has produced
-    # its final response.
-
+    # No tool calls means the LLM has
+    # produced the final answer.
     return END
 
 
@@ -226,9 +217,9 @@ def tool_node(state: State):
 
     tool_messages = []
 
-    # --------------------------------------------------------
-    # Execute every tool requested by the LLM
-    # --------------------------------------------------------
+    # ========================================================
+    # EXECUTE EVERY TOOL REQUESTED BY THE LLM
+    # ========================================================
 
     for tool_call in last_message.tool_calls:
 
@@ -239,11 +230,10 @@ def tool_node(state: State):
         arguments = tool_call["args"]
 
         # ----------------------------------------------------
-        # IMPORTANT SECURITY RULE
+        # SECURITY RULE
         #
-        # Never trust employee_id from the LLM.
-        #
-        # Always inject the authenticated employee ID.
+        # Never trust employee_id provided by the LLM.
+        # Always use the authenticated employee ID.
         # ----------------------------------------------------
 
         arguments["employee_id"] = state["employee_id"]
@@ -254,7 +244,7 @@ def tool_node(state: State):
         )
 
         # ----------------------------------------------------
-        # Execute tool
+        # EXECUTE TOOL
         # ----------------------------------------------------
 
         try:
@@ -276,7 +266,7 @@ def tool_node(state: State):
             }
 
         # ----------------------------------------------------
-        # Convert result into LangGraph ToolMessage
+        # CONVERT RESULT INTO LANGGRAPH ToolMessage
         # ----------------------------------------------------
 
         tool_messages.append(
@@ -288,20 +278,15 @@ def tool_node(state: State):
             )
         )
 
-    # --------------------------------------------------------
-    # Return all tool results to graph state
-    # --------------------------------------------------------
-
+    # Return all tool results to graph state.
     return {
         "messages": tool_messages
     }
 
 
 # ============================================================
-# 5. BUILD GRAPH
+# 5. REGISTER NODES
 # ============================================================
-
-# Register nodes
 
 builder.add_node(
     "agent",
@@ -315,7 +300,7 @@ builder.add_node(
 
 
 # ============================================================
-# 6. GRAPH FLOW
+# 6. DEFINE GRAPH FLOW
 # ============================================================
 
 # START → Agent
@@ -354,7 +339,7 @@ graph = builder.compile()
 
 
 # ============================================================
-# 8. TEST GRAPH
+# 8. TEST GRAPH DIRECTLY
 # ============================================================
 
 if __name__ == "__main__":
@@ -362,9 +347,18 @@ if __name__ == "__main__":
     result = graph.invoke(
         {
             "messages": [
+                SystemMessage(
+                    content=(
+                        "You are PTO Agent, a friendly assistant "
+                        "for Acme Corp employees. "
+                        "The authenticated employee ID is E001. "
+                        "Never ask the user to provide their "
+                        "employee ID."
+                    )
+                ),
                 HumanMessage(
                     content="Check my annual leave balance."
-                )
+                ),
             ],
             "employee_id": "E001",
         }
