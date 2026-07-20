@@ -1,7 +1,7 @@
 import json
 
 from . import config
-from .main import _client
+from .llm_client import _client
 from .tool_schema import TOOLS
 
 from .tools import (

@@ -23,8 +23,10 @@ from fastapi.responses import FileResponse
 from openai import AzureOpenAI
 from pydantic import BaseModel
 
+from llm_client import _client
 from . import config
 from .data_store import _EMPLOYEES
+from .agent_graph import graph
 
 app = FastAPI(title="TimeOffBot")
 #Creates the web server
@@ -33,17 +35,6 @@ class ChatRequest(BaseModel):
     message: str
 
 
-def _client() -> AzureOpenAI:
-    if not (config.AZURE_ENDPOINT and config.AZURE_API_KEY):
-        raise RuntimeError(
-            "Azure OpenAI credentials are missing. Copy .env.example to .env "
-            "and fill in your values."
-        )
-    return AzureOpenAI(
-        azure_endpoint=config.AZURE_ENDPOINT,
-        api_key=config.AZURE_API_KEY,
-        api_version=config.AZURE_API_VERSION,
-    )
 
 
 @app.get("/api/users")
