@@ -6,5 +6,23 @@
     "start_date": "2026-05-18",
     "end_date": "2026-05-22",
     "status": "approved"
+  },
+  {
+    "id": "REQ-1002",
+    "employee_id": "E001",
+    "leave_type": "annual",
+    "start_date": "2026-07-21",
+    "end_date": "2026-07-22",
+    "reason": "family vacation",
+    "status": "pending"
+  },
+  {
+    "id": "REQ-1003",
+    "employee_id": "E001",
+    "leave_type": "annual",
+    "start_date": "2026-08-20",
+    "end_date": "2026-08-22",
+    "reason": "family vacation",
+    "status": "pending"
   }
 ]

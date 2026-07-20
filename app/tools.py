@@ -69,16 +69,12 @@ def search_policy(query: str, employee_id:str, top_k: int = 3,):
 
 
 
-def submit_leave_request(
-    employee_id: str,
-    leave_type: str,
-    start_date: str,
-    end_date: str,
-    reason: str,
-):
+def submit_leave_request(employee_id: str, leave_type: str, start_date: str, end_date: str, reason: str ):
     """
     Submit a leave request.
     """
 
-    return submit_leave(employee_id , leave_type , start_date , end_date , reason)
+    result = submit_leave(employee_id , leave_type , start_date , end_date , reason)
+    
+    return result
     
