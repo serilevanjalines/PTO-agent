@@ -5,6 +5,7 @@ from pathlib import Path
 from fastapi import FastAPI, Header
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+#to convert json into python objects
 
 from .data_store import _EMPLOYEES
 from .agent_graph import graph
@@ -17,10 +18,6 @@ class ChatRequest(BaseModel):
     message: str
 
 
-# ============================================================
-# GET AVAILABLE EMPLOYEES
-# ============================================================
-
 @app.get("/api/users")
 def users():
     """Return the employees available in the user switcher."""
@@ -30,9 +27,6 @@ def users():
     )
 
 
-# ============================================================
-# CHAT WITH PTO AGENT
-# ============================================================
 
 @app.post("/api/chat")
 def chat(
@@ -44,9 +38,6 @@ def chat(
 ):
     """Send the user's message to the PTO Agent LangGraph."""
 
-    # --------------------------------------------------------
-    # AUTHENTICATE EMPLOYEE
-    # --------------------------------------------------------
 
     emp = _EMPLOYEES.get(
         x_user_id
@@ -67,9 +58,6 @@ def chat(
     )
 
 
-    # --------------------------------------------------------
-    # BUILD EMPLOYEE CONTEXT
-    # --------------------------------------------------------
 
     who = (
         f"You are talking to {emp['full_name']} "
@@ -78,9 +66,6 @@ def chat(
     )
 
 
-    # --------------------------------------------------------
-    # BUILD SYSTEM PROMPT
-    # --------------------------------------------------------
 
     system = (
         "You are PTO Agent, a friendly assistant "
@@ -115,9 +100,6 @@ def chat(
     )
 
 
-    # --------------------------------------------------------
-    # INVOKE LANGGRAPH
-    # --------------------------------------------------------
 
     result = graph.invoke(
         {
@@ -137,9 +119,6 @@ def chat(
     )
 
 
-    # --------------------------------------------------------
-    # GET FINAL AI RESPONSE
-    # --------------------------------------------------------
 
     final_message = result["messages"][-1]
 
