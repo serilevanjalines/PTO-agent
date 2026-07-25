@@ -99,24 +99,28 @@ def chat(
         "explicitly ask for a comparison."
     )
 
-
+    
 
     result = graph.invoke(
-        {
-            "messages": [
-                {
-                    "role": "system",
-                    "content": system,
-                },
-                {
-                    "role": "user",
-                    "content": req.message,
-                },
-            ],
-
-            "employee_id": emp["id"],
+    {
+        "messages": [
+            {
+                "role": "system",
+                "content": system,
+            },
+            {
+                "role": "user",
+                "content": req.message,
+            },
+        ],
+        "employee_id": emp["id"],
+    },
+    config={
+        "configurable": {
+            "thread_id": emp["id"],
         }
-    )
+    }
+)
 
 
 
@@ -128,9 +132,7 @@ def chat(
     }
 
 
-# ============================================================
-# SERVE FRONTEND
-# ============================================================
+
 
 @app.get("/")
 def index():

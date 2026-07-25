@@ -26,3 +26,8 @@ test_tools.py
 # Private coursework
 coursework.md
 readme_servicenow.md
+
+eval_results.json
+golden_dataset.json
+guardrail_demo.py
+session11.py

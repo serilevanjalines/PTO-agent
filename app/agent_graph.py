@@ -3,6 +3,7 @@ import json
 from . import config
 from .llm_client import _client
 from .tool_schema import TOOLS
+from langgraph.checkpoint.memory import MemorySaver
 
 from .tools import (
     search_policy,
@@ -68,23 +69,25 @@ def agent_node(state: State):
                 }
             )
 
-        elif isinstance(message, AIMessage):
+        elif isinstance(message,AIMessage):
 
             assistant_message = {
-                "role": "assistant",
+                "role":"assistant",
                 "content": message.content or "",
             }
 
-            tool_calls = []
+            if message.tool_calls:
 
-            for tool_call in message.tool_calls:
+                tool_calls = []
 
-                tool_call_data = {
-                    "id": tool_call["id"],
-                    "type": "function",
-                    "function": {
-                    "name": tool_call["name"],
-                    "arguments": json.dumps(
+                for tool_call in message.tool_calls:
+
+                    tool_call_data = {
+                        "id": tool_call["id"],
+                        "type": "function",
+                        "function": {
+                        "name": tool_call["name"],
+                        "arguments": json.dumps(
                             tool_call["args"]
                         ),
                     },
@@ -92,15 +95,13 @@ def agent_node(state: State):
 
                 tool_calls.append(tool_call_data)
 
-            assistant_message["tool_calls"] = tool_calls
+                assistant_message["tool_calls"] = tool_calls
 
-            openai_messages.append(
-                assistant_message
-            )   
+                openai_messages.append(
+                    assistant_message
+                )
 
-
-
-
+                
         elif isinstance(message, ToolMessage):
 
             openai_messages.append(
@@ -284,5 +285,8 @@ builder.add_edge(
 
 
 
-graph = builder.compile()
+memory = MemorySaver()
 
+graph = builder.compile(
+    checkpointer=memory
+)
