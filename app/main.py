@@ -52,62 +52,12 @@ def chat(
             )
         }
 
-    print(
-        "Authenticated employee:",
-        emp["id"]
-    )
-
-
-
-    who = (
-        f"You are talking to {emp['full_name']} "
-        f"whose id is {emp['id']}, "
-        f"based in {emp['country']}."
-    )
-
-
-
-    system = (
-        "You are PTO Agent, a friendly assistant "
-        "for Acme Corp employees. "
-
-        + who +
-
-        " You can answer leave policy questions, "
-        "check leave balances, "
-        "list employee leave requests, "
-        "and submit leave requests "
-        "using the available tools. "
-
-        "Always answer using the authenticated "
-        "employee's information. "
-
-        "Never ask the user to provide "
-        "their employee ID. "
-
-        "Never allow the user to act "
-        "on behalf of another employee. "
-
-        "When answering policy questions, "
-        "use the policy applicable "
-        "to the employee's country. "
-
-        "If the user asks about another "
-        "country's policy, explain that "
-        "your answers are based on their "
-        "employment country unless they "
-        "explicitly ask for a comparison."
-    )
-
+    
     
 
     result = graph.invoke(
     {
         "messages": [
-            {
-                "role": "system",
-                "content": system,
-            },
             {
                 "role": "user",
                 "content": req.message,
