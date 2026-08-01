@@ -1,27 +1,12 @@
 import json
 
-from app.agent_graph import graph
+from agent_runner import run_agent
 from evaluation.rubrics import evaluate_faithfulness
 
 
 def run_test_case(test_case):
 
-    result = graph.invoke(
-        {
-            "messages": [
-                {
-                    "role": "user",
-                    "content": test_case["input"],
-                }
-            ],
-            "employee_id": test_case["employee_id"],
-        },
-        config={
-            "configurable": {
-                "thread_id": f"faithfulness_eval_{test_case['id']}"
-            }
-        },
-    )
+    result = run_agent(test_case)
 
     messages = result["messages"]
 

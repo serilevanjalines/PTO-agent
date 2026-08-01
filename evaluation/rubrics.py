@@ -1,7 +1,5 @@
-import json
+from llm_judge import _client
 
-from app.llm_client import _client
-from app import config
 
 
 def evaluate_intent(
@@ -60,31 +58,7 @@ Return ONLY valid JSON in this format:
     "reason": "One short sentence."
 }}
 """
-
-    client = _client()
-
-    response = client.chat.completions.create(
-        model=config.AZURE_CHAT_DEPLOYMENT,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-        temperature=0,
-    )
-
-    content = response.choices[0].message.content
-
-    try:
-        return json.loads(content)
-
-    except Exception:
-        return {
-            "score": 0,
-            "reason": "Judge returned invalid JSON."
-        }
-
+    return _client(prompt)
 
 
 def evaluate_correctness(
@@ -141,29 +115,7 @@ Return ONLY valid JSON:
 }
 
 """
-    client = _client()
-    
-    response = client.chat.completions.create(
-            model=config.AZURE_CHAT_DEPLOYMENT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-            temperature=0,
-        )
-    
-    content = response.choices[0].message.content
-    
-    try:
-            return json.loads(content)
-    
-    except Exception:
-            return {
-                "score": 0,
-                "reason": "Judge returned invalid JSON."
-            }
+    return _client(prompt)
     
 
 
@@ -222,29 +174,8 @@ Return ONLY valid JSON:
     "justification:"what is your justification to prove your reason"
 }
 """
-    client = _client()
-    
-    response = client.chat.completions.create(
-            model=config.AZURE_CHAT_DEPLOYMENT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-            temperature=0,
-        )
-    
-    content = response.choices[0].message.content
-    
-    try:
-            return json.loads(content)
-    
-    except Exception:
-            return {
-                "score": 0,
-                "reason": "Judge returned invalid JSON."
-            }
+   
+    return _client(prompt)
 
 
 
@@ -320,30 +251,7 @@ Return ONLY valid JSON.
 }
 """
 
-    client = _client()
-    
-    response = client.chat.completions.create(
-            model=config.AZURE_CHAT_DEPLOYMENT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-            temperature=0,
-        )
-    
-    content = response.choices[0].message.content
-    
-    try:
-            return json.loads(content)
-    
-    except Exception:
-            return {
-                "score": 0,
-                "reason": "Judge returned invalid JSON."
-            }
-
+    return _client(prompt)
 
 
 def safety_evaluator(user_query,final_response):
@@ -400,28 +308,4 @@ Return ONLY valid JSON:
 }"""
 
     
-    client = _client()
-    
-    response = client.chat.completions.create(
-            model=config.AZURE_CHAT_DEPLOYMENT,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-            temperature=0,
-        )
-    
-    content = response.choices[0].message.content
-    
-    try:
-            return json.loads(content)
-    
-    except Exception:
-            return {
-                "score": 0,
-                "reason": "Judge returned invalid JSON."
-            }
-
-
+    return _client(prompt)
