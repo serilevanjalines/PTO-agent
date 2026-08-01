@@ -15,5 +15,23 @@
     "end_date": "2026-07-22",
     "reason": "family vacation",
     "status": "pending"
+  },
+  {
+    "id": "REQ-1003",
+    "employee_id": "E001",
+    "leave_type": "annual",
+    "start_date": "2026-08-10",
+    "end_date": "2026-08-12",
+    "reason": "Annual leave",
+    "status": "pending"
+  },
+  {
+    "id": "REQ-1004",
+    "employee_id": "E001",
+    "leave_type": "annual",
+    "start_date": "2026-08-07",
+    "end_date": "2026-08-07",
+    "reason": "Family event",
+    "status": "pending"
   }
 ]

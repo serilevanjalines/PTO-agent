@@ -53,6 +53,9 @@ Example:
 > How many annual leave days do I have?
 
 ---
+![alt text](image.png)
+
+
 
 ## Leave Request History
 
@@ -63,6 +66,9 @@ Example:
 > Show my previous leave requests.
 
 ---
+![alt text](image-1.png)
+
+
 
 ## Leave Submission
 
@@ -75,6 +81,25 @@ Example:
 If mandatory information is missing, the agent requests clarification before submitting the request.
 
 ---
+![alt text](image-2.png)
+![alt text](image-3.png)
+
+
+##  RAG-SEARCH policy
+
+
+A rag pipeline to search for user query in questioning policies
+
+Example:
+
+> can you tell me about the type of leave policies in my country .
+
+The user is not allowed to ask about a policy which he/she is not entitled.
+
+
+![alt text](image-5.png)
+
+
 
 ## Multi-turn Conversations
 
@@ -91,6 +116,8 @@ Later:
 > The reason is a family event.
 
 ---
+
+![alt text](image-4.png)
 
 ## Conversation Management
 
