@@ -1,0 +1,17 @@
+[
+    {
+        "id": "FAI001",
+        "employee_id": "E001",
+        "input": "How many annual leave days do I have?"
+    },
+    {
+        "id": "FAI002",
+        "employee_id": "E001",
+        "input": "How many days of annual leave can employees take?"
+    },
+    {
+        "id": "FAI003",
+        "employee_id": "E001",
+        "input": "Show me my previous leave requests"
+    }
+]

@@ -27,9 +27,5 @@ test_tools.py
 coursework.md
 readme_servicenow.md
 
-eval_results.json
-golden_dataset.json
-guardrail_demo.py
-session11.py
 # Local ChromaDB vector store
 chroma_db/

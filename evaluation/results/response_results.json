@@ -1,0 +1,65 @@
+[
+    {
+        "id": "RQ001",
+        "input": "How many annual leave days do I have?",
+        "AI response": {
+            "AI_replied": "You have 11 annual leave days remaining."
+        },
+        "evaluation": {
+            "response_evaluation": {
+                "score": 4,
+                "reason": "The response is mostly clear and professional but could benefit from slightly better structure and detail.",
+                "strengths": [
+                    "The response is clear and easy to understand.",
+                    "It maintains a professional tone throughout."
+                ],
+                "improvements": [
+                    "Adding more detail could enhance completeness.",
+                    "Improving the structure could make it easier to follow."
+                ]
+            }
+        }
+    },
+    {
+        "id": "RQ002",
+        "input": "Show me my previous leave requests",
+        "AI response": {
+            "AI_replied": "Here are your previous leave requests:\n\n1. **Leave Request ID:** REQ-1001\n   - **Leave Type:** Annual\n   - **Start Date:** May 18, 2026\n   - **End Date:** May 22, 2026\n   - **Status:** Approved\n\n2. **Leave Request ID:** REQ-1002\n   - **Leave Type:** Annual\n   - **Start Date:** July 21, 2026\n   - **End Date:** July 22, 2026\n   - **Reason:** Family vacation\n   - **Status:** Pending\n\nIf you need more information or want to submit a new request, just let me know!"
+        },
+        "evaluation": {
+            "response_evaluation": {
+                "score": 4,
+                "reason": "The response is generally clear and professional but could benefit from more detailed explanations.",
+                "strengths": [
+                    "The response is well-structured and easy to follow.",
+                    "It maintains a professional tone throughout."
+                ],
+                "improvements": [
+                    "Adding more detail to enhance completeness would improve the response.",
+                    "Minor wording adjustments could enhance clarity."
+                ]
+            }
+        }
+    },
+    {
+        "id": "RQ003",
+        "input": "How many days of annual leave can employees take?",
+        "AI response": {
+            "AI_replied": "As a full-time employee in the US, you receive 15 days of Paid Time Off (PTO) per year. This PTO covers both vacation and personal days. Additionally, you can carry over a maximum of 5 unused days to the next year."
+        },
+        "evaluation": {
+            "response_evaluation": {
+                "score": 4,
+                "reason": "The response is generally clear and professional but could benefit from more detailed explanations.",
+                "strengths": [
+                    "The response is well-structured and easy to follow.",
+                    "It maintains a professional tone throughout."
+                ],
+                "improvements": [
+                    "Adding more detail to enhance completeness would improve the response.",
+                    "Minor wording adjustments could enhance clarity."
+                ]
+            }
+        }
+    }
+]

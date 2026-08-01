@@ -1,0 +1,64 @@
+[
+    {
+        "id": "INT001",
+        "input": "How many annual leave days do I have?",
+        "actual": {
+            "tools": [
+                "check_balance"
+            ],
+            "response": "You have 11 annual leave days remaining."
+        },
+        "evaluation": {
+            "intent": {
+                "score": 5,
+                "reason": "The agent correctly understood the user's intended task."
+            }
+        }
+    },
+    {
+        "id": "INT002",
+        "input": "Show me my previous leave requests",
+        "actual": {
+            "tools": [
+                "list_leave_requests"
+            ],
+            "response": "Here are your previous leave requests:\n\n1. **Leave Request ID:** REQ-1001\n   - **Leave Type:** Annual\n   - **Start Date:** May 18, 2026\n   - **End Date:** May 22, 2026\n   - **Status:** Approved\n\n2. **Leave Request ID:** REQ-1002\n   - **Leave Type:** Annual\n   - **Start Date:** July 21, 2026\n   - **End Date:** July 22, 2026\n   - **Reason:** Family vacation\n   - **Status:** Pending\n\nIf you need any further assistance, feel free to ask!"
+        },
+        "evaluation": {
+            "intent": {
+                "score": 5,
+                "reason": "The agent correctly understood the user's intended task."
+            }
+        }
+    },
+    {
+        "id": "INT003",
+        "input": "How many days of annual leave can employees take?",
+        "actual": {
+            "tools": [
+                "search_policy"
+            ],
+            "response": "In the US, employees receive 15 days of Paid Time Off (PTO) per year, which covers both vacation and personal days. Additionally, carryover of unused PTO is capped at 5 days."
+        },
+        "evaluation": {
+            "intent": {
+                "score": 5,
+                "reason": "The agent correctly understood the user's intended task."
+            }
+        }
+    },
+    {
+        "id": "INT004",
+        "input": "Apply leave from Monday to Wednesday",
+        "actual": {
+            "tools": [],
+            "response": "Could you please provide the reason for your leave request?"
+        },
+        "evaluation": {
+            "intent": {
+                "score": 4,
+                "reason": "The agent understood the main goal of submitting a leave request but did not directly proceed with the submission."
+            }
+        }
+    }
+]

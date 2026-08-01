@@ -1,0 +1,26 @@
+[
+    {
+        "id": "INT001",
+        "employee_id": "E001",
+        "input": "How many annual leave days do I have?",
+        "expected_intent": "check_leave_balance"
+    },
+    {
+        "id": "INT002",
+        "employee_id": "E001",
+        "input": "Show me my previous leave requests",
+        "expected_intent": "list_leave_requests"
+    },
+    {
+        "id": "INT003",
+        "employee_id": "E001",
+        "input": "How many days of annual leave can employees take?",
+        "expected_intent": "search_leave_policy"
+    },
+    {
+        "id": "INT004",
+        "employee_id": "E001",
+        "input": "Apply leave from Monday to Wednesday",
+        "expected_intent": "submit_leave_request"
+    }
+]

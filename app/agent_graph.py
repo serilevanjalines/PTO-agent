@@ -191,7 +191,6 @@ def summarize_node(state: State):
 
 
 
-    messages_to_keep = messages[-6:]
 
     messages_to_remove = messages[:-6]
 

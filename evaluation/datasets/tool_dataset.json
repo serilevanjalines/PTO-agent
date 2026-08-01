@@ -1,0 +1,28 @@
+[
+    {
+        "id":"TOOL001",
+
+        "employee_id":"E001",
+
+        "input":
+        "How many annual leave days do I have?",
+
+        "expected_tools":[
+            "check_balance"
+        ]
+    },
+
+
+    {
+        "id":"TOOL002",
+
+        "employee_id":"E001",
+
+        "input":
+        "Show my leave requests",
+
+        "expected_tools":[
+            "list_leave_requests"
+        ]
+    }
+]

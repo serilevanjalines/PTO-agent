@@ -1,0 +1,20 @@
+[
+    {
+        "id": "COR001",
+        "employee_id": "E001",
+        "input": "How many annual leave days do I have?",
+        "expected_answer": "The employee has 11 annual leave days remaining."
+    },
+    {
+        "id": "COR002",
+        "employee_id": "E001",
+        "input": "How many days of annual leave can employees take?",
+        "expected_answer": "Employees receive 15 days of Paid Time Off (PTO) per year."
+    },
+    {
+        "id": "COR003",
+        "employee_id": "E001",
+        "input": "Show me my previous leave requests",
+        "expected_answer": "The employee has two leave requests: one approved and one pending."
+    }
+]
