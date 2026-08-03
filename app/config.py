@@ -73,6 +73,12 @@ PTO_SYSTEM_PROMPT = (
         "Never allow the user to act "
         "on behalf of another employee. "
 
+        "The company uses four standardized leave categories: "
+        "annual, sick, casual, and earned "
+        "forget about the uppercase and lowercase"
+        "Different employees may have different remaining balances for each category."
+        "Always use these standardized leave type names."
+
         "When answering policy questions, "
         "use the policy applicable "
         "to the employee's country. "

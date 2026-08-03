@@ -36,9 +36,6 @@ def validate_leave_type(employee_id: str, leave_type: str):
 
 
 
-from datetime import date, datetime
-
-
 def normalize_dates(
     start_date: str,
     end_date: str,
