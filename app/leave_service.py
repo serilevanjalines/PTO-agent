@@ -36,7 +36,100 @@ def validate_leave_type(employee_id: str, leave_type: str):
 
 
 
+from datetime import date, datetime
 
+
+def normalize_dates(
+    start_date: str,
+    end_date: str,
+):
+    """
+    Normalize user-provided dates into YYYY-MM-DD format.
+
+    Supported formats:
+    - 2026-08-04
+    - Aug 4
+    - August 4
+    - 4 Aug
+    - 4 August
+    - Aug 4 2026
+    - August 4, 2026
+    - 4 Aug 2026
+
+    If the year is omitted, the next occurrence of that
+    date relative to today is used.
+    """
+
+    today = date.today()
+
+    supported_formats = [
+
+        # ISO
+        "%Y-%m-%d",
+
+        # Month Day
+        "%b %d",
+        "%B %d",
+
+        # Day Month
+        "%d %b",
+        "%d %B",
+
+        # Month Day Year
+        "%b %d %Y",
+        "%B %d %Y",
+
+        # Month Day, Year
+        "%b %d, %Y",
+        "%B %d, %Y",
+
+        # Day Month Year
+        "%d %b %Y",
+        "%d %B %Y",
+    ]
+
+
+    def parse_single(raw_date: str):
+
+        raw_date = raw_date.strip()
+
+        for fmt in supported_formats:
+
+            try:
+
+                parsed = datetime.strptime(raw_date, fmt)
+
+                # Year already supplied
+                if "%Y" in fmt:
+                    return parsed.date().strftime("%Y-%m-%d")
+
+                # Year missing
+                parsed = parsed.replace(year=today.year)
+
+                parsed_date = parsed.date()
+
+                if parsed_date < today:
+                    parsed_date = parsed_date.replace(
+                        year=today.year + 1
+                    )
+
+                return parsed_date.strftime("%Y-%m-%d")
+
+            except ValueError:
+                continue
+
+        raise ValueError(
+            f"Could not understand date '{raw_date}'. "
+            "Use formats like "
+            "'2026-08-04', 'Aug 4', or 'August 4, 2026'."
+        )
+
+    normalized_start = parse_single(start_date)
+    normalized_end = parse_single(end_date)
+
+    return normalized_start, normalized_end
+
+    
 def validate_dates(start_date: str, end_date: str):
     """
     Validate that the leave dates are valid
@@ -262,6 +355,11 @@ def submit_leave_request(
     validate_leave_type(
         employee_id,
         leave_type,
+    )
+
+    start_date, end_date = normalize_dates(
+    start_date,
+    end_date
     )
 
     validate_dates(

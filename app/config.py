@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from datetime import date
 
 load_dotenv()
 
@@ -18,6 +19,9 @@ AZURE_CHAT_DEPLOYMENT = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT", "gpt-4o-mini")
 EMAIL_ADDRESS: str = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD: str = os.getenv("EMAIL_PASSWORD")
 HR_EMAIL: str = os.getenv("HR_EMAIL")
+
+
+today = date.today()
 
 
 SUMMARY_PROMPT = """
@@ -53,7 +57,12 @@ PTO_SYSTEM_PROMPT = (
         "check leave balances, "
         "list employee leave requests, "
         "and submit leave requests "
-        "using the available tools. "
+        "using the available tools. " 
+
+        f"Today's date is {today.strftime('%Y-%m-%d')}. "
+        
+        "When users mention dates without a year, interpret them as the next occurrence "
+        "of that date relative to today's date. "
 
         "Always answer using the authenticated "
         "employee's information. "
