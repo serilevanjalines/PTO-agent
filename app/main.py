@@ -2,6 +2,10 @@
 
 from pathlib import Path
 
+from openai import BadRequestError
+import logging
+
+
 from fastapi import FastAPI, Header
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -12,6 +16,8 @@ from .agent_graph import graph
 
 
 app = FastAPI(title="PTO Agent")
+
+logger = logging.getLogger(__name__)
 
 
 class ChatRequest(BaseModel):
@@ -55,10 +61,11 @@ def chat(
     
     
 
-    result = graph.invoke(
-    {
-        "messages": [
+    try :
+            result = graph.invoke(
             {
+                "messages": [
+                {
                 "role": "user",
                 "content": req.message,
             },
@@ -71,6 +78,29 @@ def chat(
         }
     }
 )
+
+    except ValueError as e:
+        return {
+        "reply": str(e)
+    }
+
+    except BadRequestError:
+        return {
+        "reply": (
+            "I'm sorry, but I couldn't process that request. "
+            "Could you rephrase it or provide a little more detail?"
+        )
+    }
+
+    except Exception:
+        logger.exception("Unexpected error while invoking PTO Agent.")
+
+        return {
+        "reply": (
+            "Sorry, something went wrong while processing your request. "
+            "Please try again."
+        )
+    }
 
 
 
