@@ -12,7 +12,7 @@ TOOLS = [
                         "description": "The user's policy question."
                     }
                 },
-                "required": ["query"]
+                "required": ["query","employee_id"]
             }
         }
     },
