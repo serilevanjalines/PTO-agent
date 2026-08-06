@@ -2,8 +2,6 @@ import chromadb
 from chromadb.utils import embedding_functions
 from rank_bm25 import BM25Okapi
 
-from pathlib import Path
-
 from . import config
 
 ef = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -123,7 +121,6 @@ def index_documents():
         metadatas=metadatas,
     )
 
-    return chunks
 
 
 def semantic_search(query: str,country:str, n_results: int = 3) -> list[dict]:
