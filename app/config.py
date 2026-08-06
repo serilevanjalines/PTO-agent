@@ -60,6 +60,8 @@ PTO_SYSTEM_PROMPT = (
         "using the available tools. " 
 
         f"Today's date is {today.strftime('%Y-%m-%d')}. "
+
+        f"Today's day is {today.strftime('%A')}"
         
         "When users mention dates without a year, interpret them as the next occurrence "
         "of that date relative to today's date. "
