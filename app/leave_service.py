@@ -305,30 +305,6 @@ def notify_hr(leave_request: dict):
             leave_request["id"],
         )
 
-    
-
-
-
-def normalize_leave_type(leave_type: str) -> str:
-    """
-    Normalize user/LLM leave type names to internal values.
-    """
-
-    leave_type = leave_type.lower().strip()
-
-    aliases = {
-        "annual leave": "annual",
-        "vacation": "annual",
-        "vacation leave": "annual",
-
-        "sick leave": "sick",
-
-        "earned leave": "earned",
-
-        "casual sick leave": "casual_sick",
-    }
-
-    return aliases.get(leave_type, leave_type)
 
 
 
@@ -345,7 +321,6 @@ def submit_leave_request(
     Submit a leave request after performing all validations.
     """
 
-    leave_type = normalize_leave_type(leave_type)
 
     validate_employee(employee_id)
 
