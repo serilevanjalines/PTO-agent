@@ -35,6 +35,26 @@ def validate_leave_type(employee_id: str, leave_type: str):
     raise ValueError(f"Employee {employee_id} does not have leave type {leave_type}.")
 
 
+def validate_leave_reason(leave_type: str, reason: str):
+    """
+    Validate that a leave reason is provided and is distinct
+    from the leave type.
+    """
+
+    if not reason or not reason.strip():
+        raise ValueError(
+            "A leave reason is required before submitting the request."
+        )
+
+    if leave_type.strip().lower() == reason.strip().lower():
+        raise ValueError(
+            f"Leave type '{leave_type}' and leave reason "
+            f"'{reason}' cannot be the same."
+        )
+    
+    return reason
+
+
 
 def normalize_dates(
     start_date: str,
@@ -328,6 +348,8 @@ def submit_leave_request(
         employee_id,
         leave_type,
     )
+
+    validate_leave_reason(leave_type,reason)
 
     start_date, end_date = normalize_dates(
     start_date,
